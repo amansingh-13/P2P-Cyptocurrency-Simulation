@@ -12,10 +12,11 @@ class Node:
     peer=set()
     txnReceived=set()
 
-    def __init__(self, nid, speed, lbid):
+    def __init__(self, nid, speed, genesis):
         self.nid=nid
         self.speed=speed # 0=fast, 1=slow
-        self.lbid=lbid
+        self.lbid=genesis.bid
+        self.blockChain[genesis.bid]=copy.deepcopy(genesis)
 
     def addBlock(self,block):
 
@@ -31,13 +32,19 @@ class Node:
 
         for a in self.peers:
             t=event.time+lat
-            action=TxnRecv(time=t,sender=)
-            heapq.heappush(hp,(t,))
+            action=TxnRecv(time=t,sender=self.nid,receiver=a,txn=event.txn)
+            heapq.heappush(hp,(t,action))
             
 
 
     def txnRecv(self,event,hp, lat):
-        pass
+        if event.txn.tid in self.txnReceived:
+            return 
+        
+        for a in self.peers:
+            t=event.time+lat
+            action=TxnRecv(time=t,sender=self.nid,receiver=a,txn=event.txn)
+            heapq.heappush(hp,(t,action))
 
     
     
