@@ -65,7 +65,15 @@ class Simulation:
 
     def handle(self, event):
         if(event.eventId == 1):
-            event.sender.txnSend(event, )
+            event.txn.sender.txnSend(event)
+        elif(event.eventId == 2):
+            event.receiver.txnRecv(event)
+        elif(event.eventId == 3):
+            event.receiver.reciveMinedBlock(event)
+        elif(event.eventId == 4):
+            event.
+        else:
+            print("bug in simulation.handle()")
             
             
                 
