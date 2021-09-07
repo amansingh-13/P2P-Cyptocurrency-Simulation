@@ -1,4 +1,9 @@
 import copy 
+from block import Block
+from transaction import Transaction
+from event import TxnRecv
+import heapq
+
 class Node:
 
     blockChain={}
@@ -7,9 +12,9 @@ class Node:
     peer=set()
     txnReceived=set()
 
-    def __init__(self, nid, type, lbid):
+    def __init__(self, nid, speed, lbid):
         self.nid=nid
-        self.type=type # 0=fast, 1=slow
+        self.speed=speed # 0=fast, 1=slow
         self.lbid=lbid
 
     def addBlock(self,block):
@@ -22,7 +27,14 @@ class Node:
 
       
     def txnSend(self, event, hp,lat):
-        pass
+        self.txnReceived.add(event.txn.tid);
+
+        for a in self.peers:
+            t=event.time+lat
+            action=TxnRecv(time=t,sender=)
+            heapq.heappush(hp,(t,))
+            
+
 
     def txnRecv(self,event,hp, lat):
         pass
