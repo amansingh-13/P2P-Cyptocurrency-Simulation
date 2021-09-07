@@ -14,6 +14,9 @@ def sample_exp(mean):
 
 class Simulation:
     def __init__(self, txngen_mean, no_nodes, slow, ttmine):
+        """
+        Initializes the simulation object
+        """
         no_slow = int(slow*no_nodes)
         self.G = nx.Graph()
         self.gblock = Block(pbid=0, bid=1, txnIncluded=set(), miner=-1)
@@ -29,6 +32,9 @@ class Simulation:
         initLatency(no_nodes)
 
     def generate_network(self):
+        """
+        Generates an appropriate network by connecting nodes
+        """
         n = len(self.nodes)
         md = int(np.log2(n))
         self.G.add_edge(0,1)
@@ -48,8 +54,13 @@ class Simulation:
         plt.show()
 
     def gen_all_txn(self, max_time):
+        """
+        Add all transaction events and start mining on the genesis
+        block in the simulation queue (including only the coinbase txn)
+        """
         for p in self.nodes:
-            
+
+            # generate block on genesis
             minetime = sample_exp(p.miningTime)
             block2mine = Block(
                 pbid=self.gblock,
@@ -62,8 +73,10 @@ class Simulation:
                 )]),
                 miner=p
             )
+            # add mining finish times to event queue
             heapq.heappush(eventq, (minetime, BlockMined(minetime, block2mine)))
             
+            # generate transactions based on the mean interarrival time
             t = sample_exp(self.txngen_mean)
             while(t < max_time):
                 elem = Transaction(
@@ -77,6 +90,9 @@ class Simulation:
                 t = t + sample_exp(self.txngen_mean)
 
     def run(self, max_time):
+        """
+        Runs simulation for `max_time`
+        """
         t = 0
         while(t < max_time and len(eventq)!=0):
             t, event = heapq.heappop(eventq)
@@ -84,6 +100,9 @@ class Simulation:
             self.handle(event)
 
     def handle(self, event):
+        """
+        Calls the appropriate event handler for latest event
+        """
         if(event.eventId == 1):
             event.txn.sender.txnSend(event)
         elif(event.eventId == 2):
