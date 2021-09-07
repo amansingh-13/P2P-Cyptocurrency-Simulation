@@ -9,7 +9,7 @@ class Node:
 
     def __init__(self, nid, type, lbid):
         self.nid=nid
-        self.type=type
+        self.type=type # 0=fast, 1=slow
         self.lbid=lbid
 
     def addBlock(self,block):
@@ -21,10 +21,10 @@ class Node:
             self.lbid=temp.bid
 
       
-    def txnSend(self, event, hp):
+    def txnSend(self, event, hp,lat):
         pass
 
-    def txnRecv(self,event,hp):
+    def txnRecv(self,event,hp, lat):
         pass
 
     
