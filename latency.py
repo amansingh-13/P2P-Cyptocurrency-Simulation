@@ -1,11 +1,11 @@
 import numpy as np
 
 p=0
-def initLatency(n):
+def initLatency(n):         # initializing a 2d array for rho
     global p
     p = np.random.uniform(10,500,[n,n])
 
-def computeLatency(i,j,m):
+def computeLatency(i,j,m):  # computing the latency by taking both nodes and size of message
     lat = p[i.nid][j.nid]
     c = 0.0
     if i.speed == 1 and j.speed == 1:
@@ -14,7 +14,5 @@ def computeLatency(i,j,m):
         c = 5.0
     lat += m/c
     mean = 96.0/c
-    # print(mean)
     lat += np.random.exponential(mean)
-    # print("lat="+str(lat))
     return lat
