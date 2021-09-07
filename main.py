@@ -50,6 +50,10 @@ class Simulation:
                 self.nodes[i].addPeer(self.nodes[x])
 
     def print_graph(self):        
+        """
+        print the graph to visualize the network
+        """
+
         nx.draw(self.G)
         plt.show()
 
