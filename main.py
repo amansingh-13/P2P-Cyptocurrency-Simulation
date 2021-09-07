@@ -80,7 +80,7 @@ class Simulation:
         t = 0
         while(t < max_time and len(eventq)!=0):
             t, event = heapq.heappop(eventq)
-            print (f"Time: {t}")
+            # print (f"Time: {t}")
             self.handle(event)
 
     def handle(self, event):
@@ -97,8 +97,13 @@ class Simulation:
             
             
 if __name__ == "__main__":
-    simulator = Simulation(1000,10,0.5,[5000]*10)
+    mean_inter_arrival=1000
+    num_nodes=10
+    percentage_slow=0.5 # (in decimals)
+    mean_mining_time=[5000]*10
+    simulation_time=10000
+    simulator = Simulation(mean_inter_arrival,num_nodes,percentage_slow,mean_mining_time)
     simulator.generate_network()
-    #simulator.print_graph()
-    simulator.gen_all_txn(10000)
-    simulator.run(10000)
+    # simulator.print_graph()
+    simulator.gen_all_txn(simulation_time)
+    simulator.run(simulation_time)
