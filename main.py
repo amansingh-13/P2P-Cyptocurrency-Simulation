@@ -69,9 +69,9 @@ class Simulation:
         elif(event.eventId == 2):
             event.receiver.txnRecv(event)
         elif(event.eventId == 3):
-            event.receiver.reciveMinedBlock(event)
+            event.receiver.verifyAndAddReceivedBlock(event)
         elif(event.eventId == 4):
-            event.
+            event.block.miner.receiveSelfMinedBlock(event)
         else:
             print("bug in simulation.handle()")
             

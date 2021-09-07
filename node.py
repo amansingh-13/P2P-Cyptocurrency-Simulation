@@ -32,7 +32,7 @@ class Node:
         self.peer.add(node)
 
     def txnSend(self, event):
-        self.txnReceived.add(event);
+        self.txnReceived.add(event)
 
         for a in self.peer:
             t=event.time+computeLatency(self,a,1)
