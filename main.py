@@ -98,6 +98,15 @@ class Simulation:
             t, event = heapq.heappop(eventq)
             # print (f"Time: {t}")
             self.handle(event)
+        file=open("log_tree.txt","w+")
+        for a in self.nodes:
+            heading="*"*100+f"Id:{a.nid}"+"*"*100+"\n"
+            file.write(heading)
+            for _,block in a.blockChain.items():
+                log_to_write=f"Id:{block.bid},Parent:block.pbid.bid, Miner:{block.miner}, Txns:{len(block.txnIncluded)}, Time:{block.time}\n"
+                file.write(log_to_write)
+            
+
 
     def handle(self, event):
         """
