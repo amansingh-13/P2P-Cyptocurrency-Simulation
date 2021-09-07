@@ -20,25 +20,25 @@ class TxnGen(Event):
     def __init__(self,time,txn):
         self.txn=txn #object of Transaction Class
 
-        Event.__init__(time=time,eventId=1)
+        Event.__init__(self,time=time,eventId=1)
 
 class TxnRecv(Event):
     def __init__(self, time,sender,receiver, txn):
         self.txn=txn
 
-        Event.__init__(time=time,sender=sender,receiver=receiver, eventId=2)
+        Event.__init__(self,time=time,sender=sender,receiver=receiver, eventId=2)
 
 class BlockRecv(Event):
     def __init__(self, time, sender, receiver, block):
         self.block=block
 
-        Event.__init__(time=time,sender=sender,receiver=receiver, eventId=3)
+        Event.__init__(self,time=time,sender=sender,receiver=receiver, eventId=3)
 
 class BlockMined(Event):
     def __init__(self,time,block):
         self.block=block
 
-        Event.__init__(time=time, eventId=4)
+        Event.__init__(self,time=time, eventId=4)
 
 
 

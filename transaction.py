@@ -4,3 +4,6 @@ class Transaction:
         self.receiver=receiver
         self.value=value
         self.tid=tid
+    
+    def __str__(self):
+        return f"Id: {self.tid}, Sender:{self.sender.nid}, Receiver: {self.receiver.nid} Value: {self.value}"
