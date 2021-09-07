@@ -128,7 +128,7 @@ class Node:
         
         
 
-        temp=copy.copy(event.block)
+        temp=copy.deepcopy(event.block)
         # temp.length=self.blockChain[temp.pbid].length+1
         self.blockChain[temp.bid]=temp
         if temp.length>self.blockChain[self.lbid].length:
