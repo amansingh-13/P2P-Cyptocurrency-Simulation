@@ -31,10 +31,18 @@ class Simulation:
         for p in nodes:
             t = sample_exp(txngen_mean)
             while(t < max_time):
-                elem = Transaction(sender=p.id, tid=count)
-                heapq.heapppush(eventq, (t, TxnGen()))
+                elem = Transaction(
+                    sender=p.id,
+                    tid = count,
+                    receiver = np.random.randint(0,len(nodes)),
+                    value = 0,
+                    time = t
+                )
+                heapq.heapppush(eventq, (t, TxnGen(time=t, txn=elem)))
+                
                 t = t + sample_exp(txngen_mean)
                 count += 1
+
 
     def run(self, max_time):
         t = 0
