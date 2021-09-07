@@ -13,7 +13,7 @@ class Simulation:
     def generate_network(self):
         for p in self.peers:
             for i in range(len(self.peers)):
-                
+
     
     
 

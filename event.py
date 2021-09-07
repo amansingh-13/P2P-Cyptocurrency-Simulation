@@ -1,4 +1,4 @@
-
+import copy 
 class Event:
 
     def __init__(self, time,type, sender=-1, receiver=-1):
