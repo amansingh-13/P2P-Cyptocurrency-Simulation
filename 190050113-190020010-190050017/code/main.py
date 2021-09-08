@@ -107,7 +107,10 @@ class Simulation:
             heading="*"*100+f"Id:{a.nid}"+"*"*100+"\n"
             file.write(heading)
             for _,block in a.blockChain.items():
-                log_to_write=f"Id:{block.bid},Parent:block.pbid.bid, Miner:{block.miner}, Txns:{len(block.txnIncluded)}, Time:{block.time}\n"
+                if block.pbid == 0: 
+                    log_to_write=f"Id:{block.bid},Parent:{-1}, Miner:{block.miner}, Txns:{len(block.txnIncluded)}, Time:{block.time}\n"
+                else:
+                    log_to_write=f"Id:{block.bid},Parent:{block.pbid.bid}, Miner:{block.miner}, Txns:{len(block.txnIncluded)}, Time:{block.time}\n"
                 file.write(log_to_write)
             
 
@@ -126,6 +129,10 @@ class Simulation:
             event.block.miner.receiveSelfMinedBlock(event)
         else:
             print("bug in simulation.handle()")
+
+    def draw_bc(self, nid):
+        nx.draw(self.nodes[nid].g)
+        plt.show()
             
             
 if __name__ == "__main__":
@@ -139,3 +146,7 @@ if __name__ == "__main__":
     # simulator.print_graph()
     simulator.gen_all_txn(simulation_time)
     simulator.run(simulation_time)
+
+
+    # draw blockchain
+    # for i in range(10): simulator.draw_bc(i)

@@ -8,6 +8,7 @@ import heapq
 import numpy as np 
 from random import sample
 from latency import computeLatency
+import networkx as nx
 
 from queue import pushq
 
@@ -18,6 +19,7 @@ class Node:
     peer=set() # neighbours of the node
     txnReceived=set() # txn received till now 
     blockReceived=set() # blocks received till now 
+    g = nx.DiGraph() # graph
 
 
     def __init__(self, nid, speed, genesis, miningTime):
@@ -132,6 +134,7 @@ class Node:
         temp.time=event.time
         # temp.length=self.blockChain[temp.pbid].length+1
         self.blockChain[temp.bid]=temp
+        self.g.add_edge(temp.bid, temp.pbid.bid)
         if temp.length>self.blockChain[self.lbid].length:
             self.lbid=temp.bid
             self.mineNewBlock(block=temp,lat=event.time)
@@ -155,6 +158,7 @@ class Node:
         temp.time=event.time
 
         self.blockChain[temp.bid]=temp
+        self.g.add_edge(temp.bid, temp.pbid.bid)
 
         
         self.blockReceived.add(temp.bid)
