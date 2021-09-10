@@ -21,17 +21,30 @@ class Block:
             self.txnPool=set()
             self.length=1
         
-        for a in txnIncluded:
-            self.txnPool.add(a)
+        
 
         if pbid!=0:
             self.balance=copy.deepcopy(pbid.balance)
         else:
             self.balance=[]
+
+        invalidTxnx=set()
+
         for a in txnIncluded: #updating balance of all the user 
+            tv=1
             if a.sender!=-1:
-                self.balance[a.sender.nid]-=a.value
-            self.balance[a.receiver.nid]+=a.value
+                tv=self.balance[a.sender.nid]-a.value
+            if tv<0:
+                invalidTxnx.add(a)
+            else :
+                if a.sender!=-1:
+                    self.balance[a.sender.nid]=tv
+                self.balance[a.receiver.nid]+=a.value
+
+        txnIncluded=txnIncluded.difference(invalidTxnx)
+        
+        for a in txnIncluded:
+            self.txnPool.add(a)
             
     def __str__ (self):
         return f"Id:{self.bid},Parent:{self.pbid.bid}, Miner:{self.miner}, Txns:{len(self.txnIncluded)}, Time:{self.time}"

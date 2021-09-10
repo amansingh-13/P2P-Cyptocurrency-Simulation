@@ -30,7 +30,7 @@ class Node:
         self.miningTime=miningTime # represent the mining power of node. It is the mean mining time of node
 
     def __str__ (self):
-        return f"(Id:{self.nid})"
+        return f"(Id:{self.nid}, Balance:{self.blockChain[self.lbid].balance[self.nid]})"
 
     #to establish connection between two node
     def addPeer(self,node):
