@@ -94,7 +94,7 @@ class AdvBlockchain:
 
 class AdversaryNode(Node):
     def __init__(self,nid,genesis,miningTime):  
-        Node.__init__(self,nid=nid,speed=1,genesis=genesis,miningTime=miningTime/25) 
+        Node.__init__(self,nid=nid,speed=1,genesis=genesis,miningTime=miningTime) 
         self.blockchain=AdvBlockchain(genesis)
         
         
@@ -177,6 +177,21 @@ class AdversaryNode(Node):
         
         else:
             self.mineNewBlock(pblock=self.blockchain.private_head, start_time=event.time)
+        
+    
+    def release_all_private_blocks(self,time):
+        private_blocks=[]
+        if self.blockchain.private_lead==0:
+            return private_blocks
+
+        while(self.blockchain.private_lead>0):
+            private_blocks.append(self.blockchain.first_private_block())
+            self.blockchain.private_lead-=1
+        
+        return private_blocks
+
+
+
 
 
 
