@@ -105,7 +105,7 @@ class StubNode(Node):
             self.mineNewBlock(pblock=self.blockchain.private_head, start_time=event.time)
 
     
-    def release_all_private_blocks(self,time):
+    def release_all_private_blocks(self):
         private_blocks=[]
         if self.blockchain.private_lead==0:
             return private_blocks
