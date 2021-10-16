@@ -1,10 +1,10 @@
 import copy
 
-from numpy.core.numeric import tensordot 
+# from numpy.core.numeric import tensordot 
 from block import Block
 from transaction import Transaction
 from event import *
-import heapq
+# import heapq 
 import numpy as np 
 from random import sample
 from utils import *
