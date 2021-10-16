@@ -64,4 +64,4 @@ class Block:
             self.txnPool.add(a)
             
     def __str__ (self):
-        return f"Id:{pretty(self.bid)}, Parent:{pretty(self.pbid.bid)}, Miner: {self.miner}, Txns:{pretty(len(self.txnIncluded), 5)}"
+        return f"Id:{pretty(self.bid)}, Parent:{pretty(self.pbid.bid)}, Miner: {self.miner}, Txns:{pretty(len(self.txnIncluded), 5)}, Time:{pretty(self.time,10)}"

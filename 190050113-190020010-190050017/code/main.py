@@ -32,6 +32,7 @@ class Simulation:
         self.txngen_mean = txngen_mean
         initLatency(no_nodes)
 
+
     def generate_network(self):
         """
         Generates an appropriate network by connecting nodes
@@ -147,11 +148,11 @@ class Simulation:
 if __name__ == "__main__":
     mean_inter_arrival = 100
     num_nodes = NUM_NODES
-    percentage_slow = 0.0 # (in decimals)
+    percentage_slow = 0.6 # (in decimals)
     
     # mean_mining_time = [25000]*10
     # simulation_time = 400000
-    mean_mining_time = [250]*10
+    mean_mining_time = [10000]*NUM_NODES
     simulation_time = 40000
 
     simulator = Simulation(mean_inter_arrival,num_nodes,percentage_slow,mean_mining_time)
@@ -161,5 +162,5 @@ if __name__ == "__main__":
     simulator.run(simulation_time)
 
     # draw bc
-    for i in range(NUM_NODES):
-            simulator.draw_bc(i)
+    # for i in range(NUM_NODES):
+    #         simulator.draw_bc(i)

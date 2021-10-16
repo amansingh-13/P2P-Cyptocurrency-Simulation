@@ -12,7 +12,7 @@ def computeLatency(i,j,m):  # computing the latency by taking both nodes and siz
         c = 100.0
     else:
         c = 5.0
-    lat += m/c
+    lat += (m/c)*8
     mean = 96.0/c
     lat += np.random.exponential(mean)
     return lat
