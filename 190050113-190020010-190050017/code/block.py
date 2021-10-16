@@ -7,14 +7,24 @@ import networkx as nx
 
 class Blockchain:
     def __init__(self, gblock):
-        self.blocks = {gblock.bid : gblock}
+        self.blocks = {gblock.bid : (gblock, 0)}
         self.head = gblock
         self.g = nx.DiGraph()
     
     def add_block(self, block, time):
         block.time=time 
-        self.blocks[block.bid] = block 
-        self.g.add_edge(block.bid, block.pbid.bid)
+        self.blocks[block.bid] = (block, time) 
+
+        cur = block
+        if(block.length >= self.head.length):
+            while(cur != 0):
+                try:
+                    if(cur.bid in self.g.neighbors(cur.pbid.bid)):
+                        break
+                except: pass
+                if(cur.pbid != 0):
+                    self.g.add_edge(cur.bid, cur.pbid.bid)
+                cur = cur.pbid
 
         if(block.length > self.head.length):
             self.head = block
@@ -25,12 +35,11 @@ class Blockchain:
         return self.head.balance[nid]
 
 class Block:
-    def __init__(self, bid, pbid, txnIncluded, miner, time=0):
+    def __init__(self, bid, pbid, txnIncluded, miner):
         self.bid = bid # block id
         self.pbid = pbid # parent block id
         self.txnIncluded = txnIncluded.copy()
         self.miner = miner
-        self.time = time
 
         # txnPool stores all the txn mined till now 
         # length shows the length of chain from genesis block till current block 
@@ -66,4 +75,4 @@ class Block:
             self.txnPool.add(a)
             
     def __str__ (self):
-        return f"Id:{pretty(self.bid)}, Parent:{pretty(self.pbid.bid)}, Miner: {self.miner}, Txns:{pretty(len(self.txnIncluded), 5)}, Time:{pretty(self.time,10)}"
+        return f"Id:{pretty(self.bid)}, Parent:{pretty(self.pbid.bid)}, Miner: {self.miner}, Txns:{pretty(len(self.txnIncluded), 5)}"
