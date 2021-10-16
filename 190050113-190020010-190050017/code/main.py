@@ -7,7 +7,8 @@ import networkx as nx
 import matplotlib.pyplot as plt
 from queue import eventq, pushq
 import random
-from latency import initLatency
+from utils import *
+from params import *
 
 def sample_exp(mean):
     return np.random.exponential(mean)
@@ -78,7 +79,7 @@ class Simulation:
                 miner=p
             )
             # add mining finish times to event queue
-            heapq.heappush(eventq, (minetime, BlockMined(minetime, block2mine)))
+            pushq(BlockMined(minetime, block2mine))
             
             # generate transactions based on the mean interarrival time
             t = sample_exp(self.txngen_mean)
@@ -90,7 +91,7 @@ class Simulation:
                     value = 0,
                 )
                 
-                heapq.heappush(eventq, (t, TxnGen(time=t, txn=elem)))
+                pushq(TxnGen(time=t, txn=elem))
                 t = t + sample_exp(self.txngen_mean)
 
     def run(self, max_time):
@@ -106,11 +107,11 @@ class Simulation:
         for a in self.nodes:
             heading="*"*100+f"Id:{a.nid}"+"*"*100+"\n"
             file.write(heading)
-            for _,block in a.blockChain.items():
+            for block, time in a.blockchain.blocks.values():
                 if block.pbid == 0: 
-                    log_to_write=f"Id:{block.bid},Parent:{-1}, Miner:{block.miner}, Txns:{len(block.txnIncluded)}, Time:{block.time}\n"
+                    log_to_write=f"Id:{pretty(block.bid)}, Parent:{pretty(-1)}, Miner: {block.miner}, Txns:{pretty(len(block.txnIncluded), 5)}, Time:{time}\n"
                 else:
-                    log_to_write=f"Id:{block.bid},Parent:{block.pbid.bid}, Miner:{block.miner}, Txns:{len(block.txnIncluded)}, Time:{block.time}\n"
+                    log_to_write=f"Id:{pretty(block.bid)}, Parent:{pretty(block.pbid.bid)}, Miner: {block.miner}, Txns:{pretty(len(block.txnIncluded), 5)}, Time:{time}\n"
                 file.write(log_to_write)
             
 
@@ -131,22 +132,34 @@ class Simulation:
             print("bug in simulation.handle()")
 
     def draw_bc(self, nid):
-        nx.draw(self.nodes[nid].g)
+        colormap = []
+        for node in self.nodes[nid].blockchain.g:
+            if(node == 1): colormap.append('red')
+            else: colormap.append('blue')
+        nx.draw(self.nodes[nid].blockchain.g, 
+                nx.drawing.nx_agraph.graphviz_layout(self.nodes[nid].blockchain.g, prog='dot'),
+                node_color=colormap,
+                node_size=20,
+                arrowsize=5)
         plt.show()
             
             
 if __name__ == "__main__":
-    mean_inter_arrival=1000
-    num_nodes=10
-    percentage_slow=0.5 # (in decimals)
-    mean_mining_time=[5000]*10
-    simulation_time=10000
+    mean_inter_arrival = 100
+    num_nodes = NUM_NODES
+    percentage_slow = 0.0 # (in decimals)
+    
+    # mean_mining_time = [25000]*10
+    # simulation_time = 400000
+    mean_mining_time = [250]*10
+    simulation_time = 40000
+
     simulator = Simulation(mean_inter_arrival,num_nodes,percentage_slow,mean_mining_time)
     simulator.generate_network()
     # simulator.print_graph()
     simulator.gen_all_txn(simulation_time)
     simulator.run(simulation_time)
 
-
-    # draw blockchain
-    # for i in range(10): simulator.draw_bc(i)
+    # draw bc
+    for i in range(NUM_NODES):
+            simulator.draw_bc(i)
