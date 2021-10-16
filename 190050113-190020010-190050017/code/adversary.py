@@ -174,6 +174,9 @@ class AdversaryNode(Node):
             print(f"{event.block}, Time:{pretty(event.time,10)}")
             print(f"Adversaey node state changed to {self.blockchain.state}")
             self.mineNewBlock(pblock=event.block, start_time=event.time)
+        
+        else:
+            self.mineNewBlock(pblock=self.blockchain.private_head, start_time=event.time)
 
 
 
