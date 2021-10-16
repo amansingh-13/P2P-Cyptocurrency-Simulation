@@ -10,12 +10,13 @@ import random
 from utils import *
 from params import *
 from adversary import *
+from stubborn import *
 
 def sample_exp(mean):
     return np.random.exponential(mean)
 
 class Simulation:
-    def __init__(self, txngen_mean, no_nodes, slow, ttmine, adversary_peers_frac):
+    def __init__(self, txngen_mean, no_nodes, slow, ttmine, adversary_peers_frac, adversary_type):
         """
         Initializes the simulation object
         """
@@ -33,7 +34,11 @@ class Simulation:
         self.txngen_mean = txngen_mean
         initLatency(no_nodes)
 
-        self.nodes.append(AdversaryNode(nid=no_nodes-1, genesis=self.gblock, miningTime=ttmine[-1]))
+        if(adversary_type == "selfish"):
+            self.nodes.append(AdversaryNode(nid=no_nodes-1, genesis=self.gblock, miningTime=ttmine[-1]))
+        else:
+            self.nodes.append(StubNode(nid=no_nodes-1, genesis=self.gblock, miningTime=ttmine[-1]))
+
         self.generate_network(int(adversary_peers_frac*(no_nodes-1)))
 
 
@@ -115,6 +120,13 @@ class Simulation:
             t, event = heapq.heappop(eventq)
             # print (f"Time: {t}")
             self.handle(event)
+        
+        pvt_blocks = self.nodes[-1].release_all_private_blocks()
+        for a in self.nodes[:-1]:
+            for blk in pvt_blocks:
+                lat = computeLatency(i=self.nodes[-1], j=a, m=100+len(blk.txnIncluded))
+                a.blockchain.add_block(blk,max_time+lat)
+
         file=open("log_tree.txt","w+")
         for a in self.nodes:
             heading="*"*100+f"Id:{a.nid}"+"*"*100+"\n"
@@ -158,7 +170,11 @@ class Simulation:
                 nx.drawing.nx_agraph.graphviz_layout(self.nodes[nid].blockchain.g, prog='dot'),
                 node_color=colormap, node_size=30, arrowsize=5)
         plt.show()
-            
+
+    def stats(self):
+        print()
+        for a in self.nodes:
+            print(f"{a} : {a.blockchain.head}")
             
 if __name__ == "__main__":
     mean_inter_arrival = 1000
@@ -166,14 +182,20 @@ if __name__ == "__main__":
     percentage_slow = 0.5 # DO NOT CHANGE
     
     mean_mining_time = [MINING_TIME]*NUM_NODES
+    
+    mean_mining_time[-1] /= 10
+
     simulation_time = SIM_TIME
     adversary_peers_frac = ADV_PEER_FRAC
 
-    simulator = Simulation(mean_inter_arrival, num_nodes, percentage_slow, mean_mining_time, adversary_peers_frac)
+    simulator = Simulation(mean_inter_arrival, num_nodes, percentage_slow, mean_mining_time, adversary_peers_frac, ADV_TYPE)
     simulator.print_graph()
     simulator.gen_all_txn(simulation_time)
     simulator.run(simulation_time)
 
     # draw bc
-    # for i in range(NUM_NODES):
-        # simulator.draw_bc(i)
+    for i in range(5):#range(NUM_NODES):
+        simulator.draw_bc(i)
+    simulator.draw_bc(49)
+
+    simulator.stats()
