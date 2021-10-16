@@ -7,13 +7,15 @@ import networkx as nx
 
 class Blockchain:
     def __init__(self, gblock):
-        self.blocks = {gblock.bid : (gblock, 0)}
+        self.blocks = {gblock.bid : gblock}
         self.head = gblock
         self.g = nx.DiGraph()
     
     def add_block(self, block, time):
-        self.blocks[block.bid] = (block, time)
+        block.time=time 
+        self.blocks[block.bid] = block 
         self.g.add_edge(block.bid, block.pbid.bid)
+
         if(block.length > self.head.length):
             self.head = block
             return True

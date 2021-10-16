@@ -108,11 +108,11 @@ class Simulation:
         for a in self.nodes:
             heading="*"*100+f"Id:{a.nid}"+"*"*100+"\n"
             file.write(heading)
-            for block, time in a.blockchain.blocks.values():
+            for block in a.blockchain.blocks.values():
                 if block.pbid == 0: 
-                    log_to_write=f"Id:{pretty(block.bid)}, Parent:{pretty(-1)}, Miner: {block.miner}, Txns:{pretty(len(block.txnIncluded), 5)}, Time:{time}\n"
+                    log_to_write=f"Id:{pretty(block.bid)}, Parent:{pretty(-1)}, Miner: {block.miner}, Txns:{pretty(len(block.txnIncluded), 5)}, Time:{block.time}\n"
                 else:
-                    log_to_write=f"Id:{pretty(block.bid)}, Parent:{pretty(block.pbid.bid)}, Miner: {block.miner}, Txns:{pretty(len(block.txnIncluded), 5)}, Time:{time}\n"
+                    log_to_write=f"Id:{pretty(block.bid)}, Parent:{pretty(block.pbid.bid)}, Miner: {block.miner}, Txns:{pretty(len(block.txnIncluded), 5)}, Time:{block.time}\n"
                 file.write(log_to_write)
             
 
