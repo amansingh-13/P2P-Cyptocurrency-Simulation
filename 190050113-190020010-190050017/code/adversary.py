@@ -17,7 +17,7 @@ class AdvBlockchain:
     
 
     def add_self_block(self,block,time):
-        block.time=time 
+        
         self.blocks[block.bid]=(block,time)
 
         if block.length<self.private_head.length:
@@ -36,7 +36,7 @@ class AdvBlockchain:
         return old_state
     
     def add_others_block(self,block,time):
-        block.time=time 
+        
         self.blocks[block.bid]=(block,time)
 
         if block.length > self.head.length :
@@ -86,7 +86,7 @@ class AdvBlockchain:
 
 class AdversaryNode(Node):
     def __init__(self,nid,genesis,miningTime):  
-        Node.__init__(nid=nid,speed=1,genesis=genesis,miningTime=miningTime) 
+        Node.__init__(self,nid=nid,speed=1,genesis=genesis,miningTime=miningTime) 
         self.blockchain=AdvBlockchain(genesis)
         
         
