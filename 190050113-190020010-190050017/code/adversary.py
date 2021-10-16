@@ -107,7 +107,7 @@ class AdversaryNode(Node):
 
         elif old_state==1:
             for a in self.peer:
-                lat=computeLatency(i=self, j=a, m=100+(self.blockchain.private_head.txnIncluded))
+                lat=computeLatency(i=self, j=a, m=100+len(self.blockchain.private_head.txnIncluded))
                 action = BlockRecv(time=event.time+lat, sender=self, receiver=a, block=self.blockchain.private_head)
                 pushq(action)
             # self.mineNewBlock(pblock=self.blockchain.private_head, start_time=event.time)
@@ -117,10 +117,10 @@ class AdversaryNode(Node):
             block2=self.blockchain.private_head.pbid 
 
             for a in self.peer:
-                lat=computeLatency(i=self, j=a, m=100+(block1.txnIncluded))
+                lat=computeLatency(i=self, j=a, m=100+len(block1.txnIncluded))
                 action = BlockRecv(time=event.time+lat, sender=self, receiver=a, block=block1)
                 pushq(action)
-                lat=computeLatency(i=self, j=a, m=100+(block2.txnIncluded))
+                lat=computeLatency(i=self, j=a, m=100+len(block2.txnIncluded))
                 action = BlockRecv(time=event.time+lat, sender=self, receiver=a, block=block2)
                 pushq(action)
             
@@ -128,7 +128,7 @@ class AdversaryNode(Node):
         
         elif old_state>2:
             for a in self.peer:
-                lat=computeLatency(i=self, j=a, m=100+(self.blockchain.first_private_block().txnIncluded))
+                lat=computeLatency(i=self, j=a, m=100+len(self.blockchain.first_private_block().txnIncluded))
                 action = BlockRecv(time=event.time+lat, sender=self, receiver=a, block=self.blockchain.first_private_block())
                 pushq(action)
 
@@ -151,7 +151,7 @@ class AdversaryNode(Node):
             print("Adversary wins from 0' to 0")
             print(f"{event.block}, Time:{pretty(event.time,10)}")
             for a in self.peer:
-                lat=computeLatency(i=self, j=a, m=100+(event.block.txnIncluded))
+                lat=computeLatency(i=self, j=a, m=100+len(event.block.txnIncluded))
                 action = BlockRecv(time=event.time+lat, sender=self, receiver=a, block=event.block)
                 pushq(action)
             self.mineNewBlock(pblock=event.block, start_time=event.time)
