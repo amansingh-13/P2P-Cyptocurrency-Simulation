@@ -161,7 +161,7 @@ class Simulation:
             
             
 if __name__ == "__main__":
-    mean_inter_arrival = 100
+    mean_inter_arrival = 1000
     num_nodes = NUM_NODES
     percentage_slow = 0.5 # DO NOT CHANGE
     
@@ -175,5 +175,5 @@ if __name__ == "__main__":
     simulator.run(simulation_time)
 
     # draw bc
-    for i in range(NUM_NODES):
-        simulator.draw_bc(i)
+    # for i in range(NUM_NODES):
+        # simulator.draw_bc(i)

@@ -112,7 +112,7 @@ class Node:
         is_longest = self.blockchain.add_block(event.block, event.time)
 
         if is_longest:
-            print(f"{event.block}, Time:{pretty(event.time,10)}")
+            # print(f"{event.block}, Time:{pretty(event.time,10)}")
             for a in self.peer:
                 lat = computeLatency(i=self, j=a, m=100+len(event.block.txnIncluded))
                 action = BlockRecv(time=event.time+lat, sender=self, receiver=a, block=event.block)

@@ -46,19 +46,27 @@ class AdvBlockchain:
 
             if self.state==1:
                 self.state=-1
-                self.private_lead=0 
+                self.private_lead=0
+
             elif self.state==0:
-                self.private_head=block 
+                self.private_head=self.head  
                 self.private_lead=0
                 self.state=0 
+
             elif self.state==2:
                 self.state=0
                 self.private_lead=0 
                 self.head=self.private_head
             
-            else :
+            elif self.state==-1:
+                self.state=0
+                self.private_lead=0
+                self.private_head=self.head 
+
+            
+            elif self.state>2 :
                 self.state-=1
-                self.private_head-=1
+                self.private_lead-=1
             
             return old_state
 
@@ -86,7 +94,7 @@ class AdvBlockchain:
 
 class AdversaryNode(Node):
     def __init__(self,nid,genesis,miningTime):  
-        Node.__init__(self,nid=nid,speed=1,genesis=genesis,miningTime=miningTime) 
+        Node.__init__(self,nid=nid,speed=1,genesis=genesis,miningTime=miningTime/25) 
         self.blockchain=AdvBlockchain(genesis)
         
         
@@ -101,6 +109,9 @@ class AdversaryNode(Node):
             return
         
         old_state=self.blockchain.add_others_block(block=event.block,time=event.time)
+        
+        print(f"{event.block}, Time:{pretty(event.time,10)}")
+        print (f"Adversaey node state changed to {self.blockchain.state}")
 
         if old_state==-1 or old_state==0:
             self.mineNewBlock(pblock=event.block, start_time=event.time)
@@ -148,8 +159,9 @@ class AdversaryNode(Node):
         old_state=self.blockchain.add_self_block(block=event.block,time=event.time)
 
         if old_state==-1:
-            print("Adversary wins from 0' to 0")
+            
             print(f"{event.block}, Time:{pretty(event.time,10)}")
+            print("Adversary wins from -1 to 0")
             for a in self.peer:
                 lat=computeLatency(i=self, j=a, m=100+len(event.block.txnIncluded))
                 action = BlockRecv(time=event.time+lat, sender=self, receiver=a, block=event.block)
@@ -158,8 +170,9 @@ class AdversaryNode(Node):
         
 
         elif old_state>-1 :
-            print(f"Private chain increased to state {self.blockchain.state}")
+            
             print(f"{event.block}, Time:{pretty(event.time,10)}")
+            print(f"Adversaey node state changed to {self.blockchain.state}")
             self.mineNewBlock(pblock=event.block, start_time=event.time)
 
 
