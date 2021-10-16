@@ -4,6 +4,7 @@ from transaction import Transaction
 from event import * 
 from utils import * 
 from queue import pushq 
+import networkx as nx 
 
 class AdvBlockchain:
     def __init__(self,gblock):
@@ -12,6 +13,7 @@ class AdvBlockchain:
         self.private_head=gblock
         self.private_lead=0
         self.state=0 # -1=0'
+        self.g=nx.DiGraph() 
     
 
     def add_self_block(self,block,time):
@@ -147,7 +149,7 @@ class AdversaryNode(Node):
 
         if old_state==-1:
             print("Adversary wins from 0' to 0")
-            print(event.block,event.time)
+            print(f"{event.block}, Time:{pretty(event.time,10)}")
             for a in self.peer:
                 lat=computeLatency(i=self, j=a, m=100+(event.block.txnIncluded))
                 action = BlockRecv(time=event.time+lat, sender=self, receiver=a, block=event.block)
@@ -157,7 +159,7 @@ class AdversaryNode(Node):
 
         elif old_state>-1 :
             print(f"Private chain increased to state {self.blockchain.state}")
-            print(event.block,event.time)
+            print(f"{event.block}, Time:{pretty(event.time,10)}")
             self.mineNewBlock(pblock=event.block, start_time=event.time)
 
 
