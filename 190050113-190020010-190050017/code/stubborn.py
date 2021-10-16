@@ -20,7 +20,6 @@ class StubBlockchain(AdvBlockchain):
         if self.state==-1:
             self.private_lead=1
             self.state=1
-            self.head=self.private_head
 
         elif self.state>-1:
             self.private_lead+=1
@@ -104,6 +103,18 @@ class StubNode(Node):
             self.mineNewBlock(pblock=event.block, start_time=event.time)
         else:
             self.mineNewBlock(pblock=self.blockchain.private_head, start_time=event.time)
+
+    
+    def release_all_private_blocks(self,time):
+        private_blocks=[]
+        if self.blockchain.private_lead==0:
+            return private_blocks
+
+        while(self.blockchain.private_lead>0):
+            private_blocks.append(self.blockchain.first_private_block())
+            self.blockchain.private_lead-=1
+        
+        return private_blocks
 
         
         
