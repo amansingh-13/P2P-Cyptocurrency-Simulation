@@ -9,16 +9,17 @@ from queue import eventq, pushq
 import random
 from utils import *
 from params import *
+#from adversary import *
 
 def sample_exp(mean):
     return np.random.exponential(mean)
 
 class Simulation:
-    def __init__(self, txngen_mean, no_nodes, slow, ttmine):
+    def __init__(self, txngen_mean, no_nodes, slow, ttmine, adversary_peers_frac):
         """
         Initializes the simulation object
         """
-        no_slow = int(slow*no_nodes)
+        no_slow = int(slow*(no_nodes-1))
         self.G = nx.Graph()
         self.gblock = Block(pbid=0, bid=1, txnIncluded=set(), miner=-1)
         self.gblock.balance = [0]*no_nodes
@@ -27,10 +28,13 @@ class Simulation:
             for i in range(no_slow)
         ] + [
             Node(nid=i, speed=1, genesis=self.gblock, miningTime=ttmine[i])
-            for i in range(no_slow, no_nodes)
+            for i in range(no_slow, (no_nodes-1))
         ]
         self.txngen_mean = txngen_mean
         initLatency(no_nodes)
+        self.generate_network()
+
+        #self.nodes = [AdversaryNode(nid=no_nodes-1, genesis=self.gblock, miningTime=ttmine[0])] + self.nodes
 
 
     def generate_network(self):
@@ -108,11 +112,11 @@ class Simulation:
         for a in self.nodes:
             heading="*"*100+f"Id:{a.nid}"+"*"*100+"\n"
             file.write(heading)
-            for block in a.blockchain.blocks.values():
+            for block, time in a.blockchain.blocks.values():
                 if block.pbid == 0: 
-                    log_to_write=f"Id:{pretty(block.bid)}, Parent:{pretty(-1)}, Miner: {block.miner}, Txns:{pretty(len(block.txnIncluded), 5)}, Time:{block.time}\n"
+                    log_to_write=f"Id:{pretty(block.bid)}, Parent:{pretty(-1)}, Miner: {block.miner}, Txns:{pretty(len(block.txnIncluded), 5)}, Time:{time}\n"
                 else:
-                    log_to_write=f"Id:{pretty(block.bid)}, Parent:{pretty(block.pbid.bid)}, Miner: {block.miner}, Txns:{pretty(len(block.txnIncluded), 5)}, Time:{block.time}\n"
+                    log_to_write=f"Id:{pretty(block.bid)}, Parent:{pretty(block.pbid.bid)}, Miner: {block.miner}, Txns:{pretty(len(block.txnIncluded), 5)}, Time:{time}\n"
                 file.write(log_to_write)
             
 
@@ -133,34 +137,36 @@ class Simulation:
             print("bug in simulation.handle()")
 
     def draw_bc(self, nid):
+        cur = self.nodes[nid].blockchain.head
+        lchain = []
+        while(cur != 0):
+            lchain.append(cur.bid)
+            cur = cur.pbid
+
         colormap = []
         for node in self.nodes[nid].blockchain.g:
-            if(node == 1): colormap.append('red')
+            if(node in lchain): colormap.append('red')
             else: colormap.append('blue')
         nx.draw(self.nodes[nid].blockchain.g, 
                 nx.drawing.nx_agraph.graphviz_layout(self.nodes[nid].blockchain.g, prog='dot'),
-                node_color=colormap,
-                node_size=20,
-                arrowsize=5)
+                node_color=colormap, node_size=30, arrowsize=5)
         plt.show()
             
             
 if __name__ == "__main__":
     mean_inter_arrival = 100
     num_nodes = NUM_NODES
-    percentage_slow = 0.6 # (in decimals)
+    percentage_slow = 0.5 # DO NOT CHANGE
     
-    # mean_mining_time = [25000]*10
-    # simulation_time = 400000
-    mean_mining_time = [10000]*NUM_NODES
-    simulation_time = 40000
+    mean_mining_time = [MINING_TIME]*NUM_NODES
+    simulation_time = SIM_TIME
+    adversary_peers_frac = ADV_PEER_FRAC
 
-    simulator = Simulation(mean_inter_arrival,num_nodes,percentage_slow,mean_mining_time)
-    simulator.generate_network()
+    simulator = Simulation(mean_inter_arrival, num_nodes, percentage_slow, mean_mining_time, adversary_peers_frac)
     # simulator.print_graph()
     simulator.gen_all_txn(simulation_time)
     simulator.run(simulation_time)
 
     # draw bc
-    # for i in range(NUM_NODES):
-    #         simulator.draw_bc(i)
+    for i in range(NUM_NODES):
+        simulator.draw_bc(i)
