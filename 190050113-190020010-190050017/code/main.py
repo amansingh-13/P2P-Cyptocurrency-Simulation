@@ -9,7 +9,7 @@ from queue import eventq, pushq
 import random
 from utils import *
 from params import *
-#from adversary import *
+from adversary import *
 
 def sample_exp(mean):
     return np.random.exponential(mean)
@@ -32,16 +32,16 @@ class Simulation:
         ]
         self.txngen_mean = txngen_mean
         initLatency(no_nodes)
-        self.generate_network()
 
-        #self.nodes = [AdversaryNode(nid=no_nodes-1, genesis=self.gblock, miningTime=ttmine[0])] + self.nodes
+        self.nodes = self.nodes.append(AdversaryNode(nid=no_nodes-1, genesis=self.gblock, miningTime=ttmine[-1]))
+        self.generate_network(int(adversary_peers_frac*(no_nodes-1)))
 
 
-    def generate_network(self):
+    def generate_network(self, adversary_peers_num):
         """
         Generates an appropriate network by connecting nodes
         """
-        n = len(self.nodes)
+        n = len(self.nodes)-1
         md = int(np.log2(n))
         self.G.add_edge(0,1)
         self.nodes[0].addPeer(self.nodes[1])
@@ -54,6 +54,13 @@ class Simulation:
                 self.G.add_edge(i,x)
                 self.nodes[x].addPeer(self.nodes[i])
                 self.nodes[i].addPeer(self.nodes[x])
+        
+        l = random.sample(range(0,n), adversary_peers_num)
+        for x in l:
+            self.G.add_edge(n,x)
+            self.nodes[n].addPeer(self.nodes[x])
+            self.nodes[x].addPeer(self.nodes[n])
+
 
     def print_graph(self):        
         """
@@ -163,7 +170,7 @@ if __name__ == "__main__":
     adversary_peers_frac = ADV_PEER_FRAC
 
     simulator = Simulation(mean_inter_arrival, num_nodes, percentage_slow, mean_mining_time, adversary_peers_frac)
-    # simulator.print_graph()
+    simulator.print_graph()
     simulator.gen_all_txn(simulation_time)
     simulator.run(simulation_time)
 
