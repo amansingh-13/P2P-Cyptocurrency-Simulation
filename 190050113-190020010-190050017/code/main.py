@@ -33,7 +33,7 @@ class Simulation:
         self.txngen_mean = txngen_mean
         initLatency(no_nodes)
 
-        self.nodes = self.nodes.append(AdversaryNode(nid=no_nodes-1, genesis=self.gblock, miningTime=ttmine[-1]))
+        self.nodes.append(AdversaryNode(nid=no_nodes-1, genesis=self.gblock, miningTime=ttmine[-1]))
         self.generate_network(int(adversary_peers_frac*(no_nodes-1)))
 
 
