@@ -123,7 +123,7 @@ class Simulation:
             self.handle(event)
         
         pvt_blocks = self.nodes[-1].release_all_private_blocks()
-        print(f"length of private_blocks {len(pvt_blocks)}")
+        # print(f"length of private_blocks {len(pvt_blocks)}")
         for a in self.nodes[:-1]:
             for blk in pvt_blocks:
                 lat = computeLatency(i=self.nodes[-1], j=a, m=100+len(blk.txnIncluded))
