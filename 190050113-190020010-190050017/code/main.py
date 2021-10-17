@@ -33,6 +33,7 @@ class Simulation:
             for i in range(no_slow, (no_nodes-1))
         ]
         self.txngen_mean = txngen_mean
+        self.total_all_blocks_gen = 0
         initLatency(no_nodes)
 
         if(adversary_type == "selfish"):
@@ -127,7 +128,7 @@ class Simulation:
         for a in self.nodes[:-1]:
             for blk in pvt_blocks:
                 lat = computeLatency(i=self.nodes[-1], j=a, m=100+len(blk.txnIncluded))
-                #a.blockchain.add_block(blk,max_time+lat)
+                a.blockchain.add_block(blk,max_time+lat)
 
         file=open("log_tree.txt","w+")
         for a in self.nodes:
@@ -153,7 +154,9 @@ class Simulation:
         elif(event.eventId == 3):
             event.receiver.verifyAndAddReceivedBlock(event)
         elif(event.eventId == 4):
-            event.block.miner.receiveSelfMinedBlock(event)
+            rv = event.block.miner.receiveSelfMinedBlock(event)
+            if(rv == 1):
+                self.total_all_blocks_gen += 1
         else:
             print("bug in simulation.handle()")
 
@@ -167,17 +170,16 @@ class Simulation:
         colormap = []
         for blk in self.nodes[nid].blockchain.g:
             if(self.nodes[nid].blockchain.blocks[blk][0].miner != -1 and \
-               self.nodes[nid].blockchain.blocks[blk][0].miner.nid == ADV_NID):
+                self.nodes[nid].blockchain.blocks[blk][0].miner.nid == ADV_NID):
                 colormap.append('green')
             elif(blk in lchain): colormap.append('red')
             else: colormap.append('blue')
         nx.draw(self.nodes[nid].blockchain.g, 
                 nx.drawing.nx_agraph.graphviz_layout(self.nodes[nid].blockchain.g, prog='dot'),
-                node_color=colormap, node_size=40, arrowsize=5)
+                node_color=colormap, node_size=40, arrowsize=5, label=True)
         plt.show()
 
-    def stats(self):
-        print()
+    def debug(self):
         unique_heads=set()
         for a in self.nodes[:-1]:
             print(f"{a} : {a.blockchain.head}")
@@ -187,6 +189,21 @@ class Simulation:
         unique_heads.add((hex(a.blockchain.private_head.bid),a.blockchain.private_head.length))
         print(f"number of unique heads {len(unique_heads)}")
         print(unique_heads)
+
+    def stats(self):
+
+        cur = self.nodes[0].blockchain.head
+        adv_blocks, total_blocks = 0, 0
+        while(cur.miner != -1):
+            total_blocks += 1
+            if(cur.miner.nid == ADV_NID):
+                adv_blocks += 1
+            cur = cur.pbid
+        print("MPU_node_adv =", adv_blocks/self.nodes[ADV_NID].blockchain.total_adv_blocks_gen)
+        print("MPU_node_overall =", total_blocks/(self.total_all_blocks_gen+self.nodes[ADV_NID].blockchain.total_adv_blocks_gen))
+        print("Fraction of attaker blocks in main chain = ", adv_blocks/total_blocks)
+
+
             
 if __name__ == "__main__":
     mean_inter_arrival = TXN_INTERARRIVAL
@@ -201,14 +218,8 @@ if __name__ == "__main__":
     adversary_peers_frac = ADV_PEER_FRAC
 
     simulator = Simulation(mean_inter_arrival, num_nodes, percentage_slow, mean_mining_time, adversary_peers_frac, ADV_TYPE)
-    
     simulator.gen_all_txn(simulation_time)
     simulator.run(simulation_time)
-
-    # draw bc
-    
-
-    
 
     while (True):
         print("Choose Option:")

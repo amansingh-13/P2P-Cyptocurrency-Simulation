@@ -9,7 +9,7 @@ import numpy as np
 from random import sample
 from utils import *
 from block import Blockchain
-
+from params import *
 from queue import pushq
 
 class Node:
@@ -111,10 +111,15 @@ class Node:
         self.blockReceived.add(event.block.bid)
         is_longest = self.blockchain.add_block(event.block, event.time)
 
+        rv = 0
+
         if is_longest:
             # print(f"{event.block}, Time:{pretty(event.time,10)}")
+            rv = 1
             for a in self.peer:
                 lat = computeLatency(i=self, j=a, m=100+len(event.block.txnIncluded))
                 action = BlockRecv(time=event.time+lat, sender=self, receiver=a, block=event.block)
                 pushq(action)
             self.mineNewBlock(pblock=event.block, start_time=event.time)
+        
+        return rv

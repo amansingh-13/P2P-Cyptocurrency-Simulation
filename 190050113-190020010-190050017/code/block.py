@@ -15,16 +15,22 @@ class Blockchain:
         block.time=time 
         self.blocks[block.bid] = (block, time) 
 
-        cur = block
         if(block.length >= self.head.length or block.miner.nid == ADV_NID):
-            while(cur != 0):
-                try:
-                    if(cur.bid in self.g.neighbors(cur.pbid.bid)):
-                        break
-                except: pass
-                if(cur.pbid != 0):
-                    self.g.add_edge(cur.bid, cur.pbid.bid)
-                cur = cur.pbid
+            for blk, _ in self.blocks.values():
+                if(blk.bid == block.pbid.bid):
+                    self.g.add_edge(block.bid, block.pbid.bid)
+                if(blk.pbid != 0 and blk.pbid.bid == block.bid):
+                    self.g.add_edge(blk.bid, block.bid)
+
+            # cur = block
+            # while(cur != 0 and cur in ):
+            #     try:
+            #         if(cur.bid in self.g.neighbors(cur.pbid.bid)):
+            #             break
+            #     except: pass
+            #     if(cur.pbid != 0):
+            #         self.g.add_edge(cur.bid, cur.pbid.bid)
+            #     cur = cur.pbid
 
         if(block.length > self.head.length):
             self.head = block

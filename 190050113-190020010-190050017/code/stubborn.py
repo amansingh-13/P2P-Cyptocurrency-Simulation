@@ -8,7 +8,6 @@ class StubBlockchain(AdvBlockchain):
     
 
     def add_self_block(self,block,time):
-        
         self.blocks[block.bid]=(block,time)
 
         if block.length<self.private_head.length:
@@ -16,6 +15,8 @@ class StubBlockchain(AdvBlockchain):
 
         old_state=self.state 
         self.private_head=block
+        self.total_adv_blocks_gen += 1
+
 
         if self.state==-1:
             self.private_lead=1
@@ -79,7 +80,7 @@ class StubNode(Node):
         old_state=self.blockchain.add_others_block(block=event.block,time=event.time)
         
         print(f"{event.block}, Time:{pretty(event.time,10)}")
-        print (f"Adversaey node state changed to {self.blockchain.state}")
+        print (f"Adversary node state changed to {self.blockchain.state}")
 
         if old_state==-1 or old_state==0:
             self.mineNewBlock(pblock=self.blockchain.private_head, start_time=event.time)
@@ -101,7 +102,7 @@ class StubNode(Node):
         old_state=self.blockchain.add_self_block(block=event.block,time=event.time)
         if old_state>=-1:
             print(f"{event.block}, Time:{pretty(event.time,10)}")
-            print(f"Adversaey node state changed to {self.blockchain.state}")
+            print(f"Adversary node state changed to {self.blockchain.state}")
             self.mineNewBlock(pblock=self.blockchain.private_head, start_time=event.time)
         # else:
             # self.mineNewBlock(pblock=self.blockchain.private_head, start_time=event.time)
