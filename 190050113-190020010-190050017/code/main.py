@@ -163,12 +163,15 @@ class Simulation:
             cur = cur.pbid
 
         colormap = []
-        for node in self.nodes[nid].blockchain.g:
-            if(node in lchain): colormap.append('red')
+        for blk in self.nodes[nid].blockchain.g:
+            if(self.nodes[nid].blockchain.blocks[blk][0].miner != -1 and \
+               self.nodes[nid].blockchain.blocks[blk][0].miner.nid == ADV_NID):
+                colormap.append('green')
+            elif(blk in lchain): colormap.append('red')
             else: colormap.append('blue')
         nx.draw(self.nodes[nid].blockchain.g, 
                 nx.drawing.nx_agraph.graphviz_layout(self.nodes[nid].blockchain.g, prog='dot'),
-                node_color=colormap, node_size=30, arrowsize=5)
+                node_color=colormap, node_size=40, arrowsize=5)
         plt.show()
 
     def stats(self):
@@ -177,7 +180,7 @@ class Simulation:
             print(f"{a} : {a.blockchain.head}")
             
 if __name__ == "__main__":
-    mean_inter_arrival = 1000
+    mean_inter_arrival = TXN_INTERARRIVAL
     num_nodes = NUM_NODES
     percentage_slow = 0.5 # DO NOT CHANGE
     
