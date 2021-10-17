@@ -82,14 +82,16 @@ class StubNode(Node):
         print (f"Adversaey node state changed to {self.blockchain.state}")
 
         if old_state==-1 or old_state==0:
-            self.mineNewBlock(pblock=event.block, start_time=event.time)
+            self.mineNewBlock(pblock=self.blockchain.private_head, start_time=event.time)
 
         
         elif old_state>0:
+            block=self.blockchain.first_private_block(offset=1)
             for a in self.peer:
-                lat=computeLatency(i=self, j=a, m=100+len(self.blockchain.first_private_block().txnIncluded))
-                action = BlockRecv(time=event.time+lat, sender=self, receiver=a, block=self.blockchain.first_private_block())
+                lat=computeLatency(i=self, j=a, m=100+len(block.txnIncluded))
+                action = BlockRecv(time=event.time+lat, sender=self, receiver=a, block=block)
                 pushq(action)
+            
 
 
 
@@ -100,9 +102,9 @@ class StubNode(Node):
         if old_state>=-1:
             print(f"{event.block}, Time:{pretty(event.time,10)}")
             print(f"Adversaey node state changed to {self.blockchain.state}")
-            self.mineNewBlock(pblock=event.block, start_time=event.time)
-        else:
             self.mineNewBlock(pblock=self.blockchain.private_head, start_time=event.time)
+        # else:
+            # self.mineNewBlock(pblock=self.blockchain.private_head, start_time=event.time)
 
     
     def release_all_private_blocks(self):

@@ -1,3 +1,4 @@
+import queue
 import numpy as np
 import heapq
 from node import Node
@@ -122,6 +123,7 @@ class Simulation:
             self.handle(event)
         
         pvt_blocks = self.nodes[-1].release_all_private_blocks()
+        print(f"length of private_blocks {len(pvt_blocks)}")
         for a in self.nodes[:-1]:
             for blk in pvt_blocks:
                 lat = computeLatency(i=self.nodes[-1], j=a, m=100+len(blk.txnIncluded))
@@ -173,8 +175,15 @@ class Simulation:
 
     def stats(self):
         print()
-        for a in self.nodes:
+        # unique_heads=set()
+        for a in self.nodes[:-1]:
             print(f"{a} : {a.blockchain.head}")
+            # unique_heads.add((hex(a.blockchain.head.bid),a.blockchain.head.length))
+        a=self.nodes[-1]
+        print(f"{a} : {a.blockchain.private_head}")
+        # unique_heads.add((hex(a.blockchain.private_head.bid),a.blockchain.private_head.length))
+        # print(f"number of unique heads {len(unique_heads)}")
+        # print(unique_heads)
             
 if __name__ == "__main__":
     mean_inter_arrival = 1000
@@ -183,19 +192,41 @@ if __name__ == "__main__":
     
     mean_mining_time = [MINING_TIME]*NUM_NODES
     
-    mean_mining_time[-1] /= 10
+    mean_mining_time[-1] /= 50
 
     simulation_time = SIM_TIME
     adversary_peers_frac = ADV_PEER_FRAC
 
     simulator = Simulation(mean_inter_arrival, num_nodes, percentage_slow, mean_mining_time, adversary_peers_frac, ADV_TYPE)
-    simulator.print_graph()
+    
     simulator.gen_all_txn(simulation_time)
     simulator.run(simulation_time)
 
     # draw bc
-    for i in range(5):#range(NUM_NODES):
-        simulator.draw_bc(i)
-    simulator.draw_bc(49)
+    
 
-    simulator.stats()
+    
+
+    while (True):
+        print("Choose Option:")
+        print("1. View Blockchain Network")
+        print("2. View Blockchain of a node")
+        print("3. View Stats")
+        print("4. QUIT")
+        try:
+            query=int(input())
+        except:
+            break 
+
+        if query==1:
+            simulator.print_graph()
+        elif query==2:
+            bid=int(input("Id of Node"))
+            simulator.draw_bc(bid)
+        elif query==3:
+            simulator.stats()
+        else:
+            break 
+    
+
+

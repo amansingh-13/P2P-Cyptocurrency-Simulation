@@ -72,10 +72,10 @@ class AdvBlockchain:
 
         return -100 
     
-    def first_private_block(self) :
+    def first_private_block(self,offset=0) :
         
         block=self.private_head
-        l=self.private_lead
+        l=self.private_lead+offset
         while(l>1):
             block=block.pbid
             l-=1
@@ -114,7 +114,7 @@ class AdversaryNode(Node):
         print (f"Adversaey node state changed to {self.blockchain.state}")
 
         if old_state==-1 or old_state==0:
-            self.mineNewBlock(pblock=event.block, start_time=event.time)
+            self.mineNewBlock(pblock=self.blockchain.private_head, start_time=event.time)
 
         elif old_state==1:
             for a in self.peer:
@@ -138,9 +138,10 @@ class AdversaryNode(Node):
             # self.mineNewBlock(pblock=self.blockchain.private_head, start_time=event.time)
         
         elif old_state>2:
+            block=self.blockchain.first_private_block(offset=1)
             for a in self.peer:
-                lat=computeLatency(i=self, j=a, m=100+len(self.blockchain.first_private_block().txnIncluded))
-                action = BlockRecv(time=event.time+lat, sender=self, receiver=a, block=self.blockchain.first_private_block())
+                lat=computeLatency(i=self, j=a, m=100+len(block.txnIncluded))
+                action = BlockRecv(time=event.time+lat, sender=self, receiver=a, block=block)
                 pushq(action)
 
 
@@ -166,17 +167,17 @@ class AdversaryNode(Node):
                 lat=computeLatency(i=self, j=a, m=100+len(event.block.txnIncluded))
                 action = BlockRecv(time=event.time+lat, sender=self, receiver=a, block=event.block)
                 pushq(action)
-            self.mineNewBlock(pblock=event.block, start_time=event.time)
+            self.mineNewBlock(pblock=self.blockchain.private_head, start_time=event.time)
         
 
         elif old_state>-1 :
             
             print(f"{event.block}, Time:{pretty(event.time,10)}")
             print(f"Adversaey node state changed to {self.blockchain.state}")
-            self.mineNewBlock(pblock=event.block, start_time=event.time)
-        
-        else:
             self.mineNewBlock(pblock=self.blockchain.private_head, start_time=event.time)
+        
+        # else:
+            # self.mineNewBlock(pblock=self.blockchain.private_head, start_time=event.time)
         
     
     def release_all_private_blocks(self):
