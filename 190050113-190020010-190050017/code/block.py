@@ -16,7 +16,7 @@ class Blockchain:
         self.blocks[block.bid] = (block, time) 
 
         cur = block
-        if(block.length >= self.head.length):
+        if(block.length >= self.head.length or block.miner.nid == ADV_NID):
             while(cur != 0):
                 try:
                     if(cur.bid in self.g.neighbors(cur.pbid.bid)):
