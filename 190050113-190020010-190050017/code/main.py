@@ -127,7 +127,7 @@ class Simulation:
         for a in self.nodes[:-1]:
             for blk in pvt_blocks:
                 lat = computeLatency(i=self.nodes[-1], j=a, m=100+len(blk.txnIncluded))
-                a.blockchain.add_block(blk,max_time+lat)
+                #a.blockchain.add_block(blk,max_time+lat)
 
         file=open("log_tree.txt","w+")
         for a in self.nodes:
@@ -178,15 +178,15 @@ class Simulation:
 
     def stats(self):
         print()
-        # unique_heads=set()
+        unique_heads=set()
         for a in self.nodes[:-1]:
             print(f"{a} : {a.blockchain.head}")
-            # unique_heads.add((hex(a.blockchain.head.bid),a.blockchain.head.length))
+            unique_heads.add((hex(a.blockchain.head.bid),a.blockchain.head.length))
         a=self.nodes[-1]
         print(f"{a} : {a.blockchain.private_head}")
-        # unique_heads.add((hex(a.blockchain.private_head.bid),a.blockchain.private_head.length))
-        # print(f"number of unique heads {len(unique_heads)}")
-        # print(unique_heads)
+        unique_heads.add((hex(a.blockchain.private_head.bid),a.blockchain.private_head.length))
+        print(f"number of unique heads {len(unique_heads)}")
+        print(unique_heads)
             
 if __name__ == "__main__":
     mean_inter_arrival = TXN_INTERARRIVAL
@@ -224,7 +224,7 @@ if __name__ == "__main__":
         if query==1:
             simulator.print_graph()
         elif query==2:
-            bid=int(input("Id of Node"))
+            bid=int(input("Id of Node "))
             simulator.draw_bc(bid)
         elif query==3:
             simulator.stats()
