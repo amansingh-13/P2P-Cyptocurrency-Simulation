@@ -1,7 +1,9 @@
 from adversary import * 
 from node import Node
 
-
+#this blockchain is for adversary node 
+# it inherits form AdvBlockchain
+# only difference is in the transition form 2 -> 1 and 0'-> 0 or 1.
 class StubBlockchain(AdvBlockchain):
     def __init__(self, gblock):
         super().__init__(gblock)
@@ -62,6 +64,8 @@ class StubBlockchain(AdvBlockchain):
 
         return -100 
 
+# this is similar to AdvNode, only difference is handling transition for 0' to 0 or 1 and 2 to 1. 
+# it does not go form 2 to 0 directly. 
 
 class StubNode(Node):
     def __init__(self, nid, genesis, miningTime):
