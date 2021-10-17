@@ -5,6 +5,7 @@ from event import *
 from utils import * 
 from queue import pushq 
 import networkx as nx 
+from params import *
 
 class AdvBlockchain:
     def __init__(self,gblock):
@@ -14,10 +15,11 @@ class AdvBlockchain:
         self.private_lead=0
         self.state=0 # -1=0'
         self.g=nx.DiGraph() 
+        self.total_adv_blocks_gen  = 0
     
 
     def add_self_block(self,block,time):
-        
+
         self.blocks[block.bid]=(block,time)
 
         if block.length<self.private_head.length:
@@ -25,6 +27,7 @@ class AdvBlockchain:
 
         old_state=self.state 
         self.private_head=block 
+        self.total_adv_blocks_gen += 1
         if self.state==-1:
             self.private_lead=0
             self.head=self.private_head
@@ -111,7 +114,7 @@ class AdversaryNode(Node):
         old_state=self.blockchain.add_others_block(block=event.block,time=event.time)
         
         print(f"{event.block}, Time:{pretty(event.time,10)}")
-        print (f"Adversaey node state changed to {self.blockchain.state}")
+        print (f"Adversary node state changed to {self.blockchain.state}")
 
         if old_state==-1 or old_state==0:
             self.mineNewBlock(pblock=self.blockchain.private_head, start_time=event.time)
@@ -173,7 +176,7 @@ class AdversaryNode(Node):
         elif old_state>-1 :
             
             print(f"{event.block}, Time:{pretty(event.time,10)}")
-            print(f"Adversaey node state changed to {self.blockchain.state}")
+            print(f"Adversary node state changed to {self.blockchain.state}")
             self.mineNewBlock(pblock=self.blockchain.private_head, start_time=event.time)
         
         # else:
