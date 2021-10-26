@@ -199,9 +199,9 @@ class Simulation:
             if(cur.miner.nid == ADV_NID):
                 adv_blocks += 1
             cur = cur.pbid
-        print("MPU_node_adv =", adv_blocks/self.nodes[ADV_NID].blockchain.total_adv_blocks_gen)
-        print("MPU_node_overall =", total_blocks/(self.total_all_blocks_gen+self.nodes[ADV_NID].blockchain.total_adv_blocks_gen))
-        print("Fraction of attaker blocks in main chain = ", adv_blocks/total_blocks)
+        return adv_blocks/self.nodes[ADV_NID].blockchain.total_adv_blocks_gen, \
+               total_blocks/(self.total_all_blocks_gen+self.nodes[ADV_NID].blockchain.total_adv_blocks_gen), \
+               adv_blocks/total_blocks
 
 
             
@@ -212,16 +212,25 @@ if __name__ == "__main__":
     
     mean_mining_time = [MINING_TIME]*NUM_NODES
     
-    mean_mining_time[-1] /= 50
+    mean_mining_time[-1] /= 25
 
     simulation_time = SIM_TIME
     adversary_peers_frac = ADV_PEER_FRAC
 
-    simulator = Simulation(mean_inter_arrival, num_nodes, percentage_slow, mean_mining_time, adversary_peers_frac, ADV_TYPE)
-    simulator.gen_all_txn(simulation_time)
-    simulator.run(simulation_time)
 
-    while (True):
+    res = 0, 0, 0
+    for _ in range(4):
+        simulator = Simulation(mean_inter_arrival, num_nodes, percentage_slow, mean_mining_time, adversary_peers_frac, ADV_TYPE)
+        simulator.gen_all_txn(simulation_time)
+        simulator.run(simulation_time)
+        s = simulator.stats()
+        res = res[0]+s[0], res[1]+s[1], res[2]+s[2]
+    
+    print("mpu node adv", res[0]/4)
+    print("mpu node overall", res[1]/4)
+    print("fraction", res[2]/4)
+
+    while (False):
         print("Choose Option:")
         print("1. View Blockchain Network")
         print("2. View Blockchain of a node")
