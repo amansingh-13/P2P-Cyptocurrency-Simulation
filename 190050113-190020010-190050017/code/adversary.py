@@ -7,6 +7,7 @@ from queue import pushq
 import networkx as nx 
 from params import *
 
+#this blockchain is for adversary node 
 class AdvBlockchain:
     def __init__(self,gblock):
         self.blocks={gblock.bid:(gblock,0)}
@@ -17,7 +18,8 @@ class AdvBlockchain:
         self.g=nx.DiGraph() 
         self.total_adv_blocks_gen  = 0
     
-
+    #different function of adding self block.
+    # Self block will always be added in private chain 
     def add_self_block(self,block,time):
 
         self.blocks[block.bid]=(block,time)
@@ -37,7 +39,11 @@ class AdvBlockchain:
         self.state+=1
 
         return old_state
-    
+
+    # differnt function for adding foreign block
+    # proper chnage in state is maintained and all the 
+    # private blocks are released at state = 2 and 1 
+    # for other states, first private block is released 
     def add_others_block(self,block,time):
         
         self.blocks[block.bid]=(block,time)
@@ -75,6 +81,8 @@ class AdvBlockchain:
 
         return -100 
     
+    # return the first block of 
+    # the hidden chain(private chain)
     def first_private_block(self,offset=0) :
         
         block=self.private_head
@@ -93,7 +101,11 @@ class AdvBlockchain:
 
 
 
-
+'''
+Adversay node inmherits most of the function from the simple node.
+Only different action is taken when a foreign nide arrives at adversary node
+and if the adversary node mine a new block successfully 
+'''
 
 class AdversaryNode(Node):
     def __init__(self,nid,genesis,miningTime):  
@@ -179,10 +191,13 @@ class AdversaryNode(Node):
             print(f"Adversary node state changed to {self.blockchain.state}")
             self.mineNewBlock(pblock=self.blockchain.private_head, start_time=event.time)
         
-        # else:
-            # self.mineNewBlock(pblock=self.blockchain.private_head, start_time=event.time)
         
-    
+        
+   # this function helps to release all the nodes at the end of the simulation
+   # # this is necessary to maintain  the uniformity in network after the end of simulation
+   # because if the adversary node is very poerful then it can even maintain 
+   # a lead of more than 10 blocks. So using this function we can bring uniformity and 
+   # hence bettter visualisation 
     def release_all_private_blocks(self):
         private_blocks=[]
         if self.blockchain.private_lead==0:
